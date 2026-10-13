@@ -1,0 +1,311 @@
+<!doctype html>
+<html lang="ro">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bacalaureat la mate-info</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Familjen+Grotesk:wght@500;600;700&family=Literata:opsz,wght@7..72,400;7..72,600&family=JetBrains+Mono:wght@500&display=swap">
+<style>
+/* Layout: a single reading column; a probe map up top, a comparison table, then one "fișă" per subject with its PDFs */
+:root{
+  --bg:#f3f5f8; --surface:#ffffff; --fg:#17202e; --muted:#5a6578; --line:#d9dee7;
+  --ink:#1f3f78; --ink-soft:#e4eaf5; --stamp:#b3362b; --ok:#2d6a4f;
+  --display:"Familjen Grotesk","Segoe UI",system-ui,sans-serif;
+  --body:"Literata",Georgia,"Times New Roman",serif;
+  --mono:"JetBrains Mono",ui-monospace,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#11161f; --surface:#19202c; --fg:#e6eaf1; --muted:#9aa5b8; --line:#2c3545;
+  --ink:#8fb0ec; --ink-soft:#1f2a3d; --stamp:#ec7a6c; --ok:#79c49d; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#11161f; --surface:#19202c; --fg:#e6eaf1; --muted:#9aa5b8; --line:#2c3545;
+  --ink:#8fb0ec; --ink-soft:#1f2a3d; --stamp:#ec7a6c; --ok:#79c49d; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font-family:var(--body);font-size:16px;line-height:1.6}
+.wrap{max-width:860px;margin:0 auto;padding-inline:16px;padding-block:40px 64px}
+h1,h2,h3{font-family:var(--display);line-height:1.15;text-wrap:balance;margin:0}
+h1{font-size:clamp(1.9rem,5vw,2.6rem);font-weight:700;letter-spacing:-.01em}
+h2{font-size:1.45rem;font-weight:700;margin-top:48px;margin-bottom:12px}
+h3{font-size:1.2rem;font-weight:600}
+p{margin:0 0 12px;max-width:68ch}
+.eyebrow{font-family:var(--mono);font-size:.75rem;letter-spacing:.08em;text-transform:uppercase;color:var(--stamp)}
+.lede{color:var(--muted);font-size:1.05rem;margin-top:12px}
+a{color:var(--ink)}
+a:focus-visible,button:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
+.note{border-left:3px solid var(--stamp);padding:10px 14px;background:var(--surface);margin:20px 0;font-size:.95rem}
+.note p:last-child{margin:0}
+
+.probe-map{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin-top:16px}
+.probe{background:var(--surface);border:1px solid var(--line);padding:14px 16px;min-width:0}
+.probe .code{font-family:var(--mono);font-size:.8rem;color:var(--ink)}
+.probe strong{display:block;font-family:var(--display);font-size:1.05rem;margin:2px 0 4px}
+.probe span{color:var(--muted);font-size:.9rem}
+.probe.choice{border-color:var(--ink);background:var(--ink-soft)}
+
+.tbl{overflow-x:auto;margin-top:12px;border:1px solid var(--line);background:var(--surface)}
+table{border-collapse:collapse;width:100%;min-width:640px;font-size:.92rem}
+th,td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-family:var(--display);font-weight:600;font-size:.85rem;color:var(--muted);background:var(--bg)}
+tr:last-child td{border-bottom:0}
+td:first-child{font-family:var(--display);font-weight:600;white-space:nowrap}
+
+.toc{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+.toc a{font-family:var(--display);font-size:.9rem;text-decoration:none;border:1px solid var(--line);background:var(--surface);padding:5px 12px;border-radius:999px}
+.toc a:hover{border-color:var(--ink)}
+
+.fisa{background:var(--surface);border:1px solid var(--line);margin-top:28px;scroll-margin-top:16px}
+.fisa header{padding:18px 20px 14px;border-bottom:1px solid var(--line);display:flex;flex-wrap:wrap;gap:6px 16px;align-items:baseline;justify-content:space-between}
+.fisa header .tag{font-family:var(--mono);font-size:.75rem;color:var(--muted)}
+.fisa .body{padding:16px 20px 20px;display:grid;gap:16px}
+.scale{display:flex;height:30px;font-family:var(--mono);font-size:.72rem;border:1px solid var(--line)}
+.scale div{display:flex;align-items:center;justify-content:center;border-right:1px solid var(--surface);background:var(--ink-soft);color:var(--fg);min-width:0;overflow:hidden;white-space:nowrap;padding:0 4px}
+.scale div.of{background:var(--bg);color:var(--muted)}
+.scale div:last-child{border-right:0}
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media (max-width:640px){.cols{grid-template-columns:1fr}}
+.cols>div{min-width:0}
+.lbl{font-family:var(--display);font-weight:600;font-size:.82rem;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);margin-bottom:4px}
+ul{margin:0;padding-left:1.1em}
+li{margin-bottom:4px}
+.plus li::marker{color:var(--ok);content:"+  "}
+.minus li::marker{color:var(--stamp);content:"–  "}
+.files{border-top:1px dashed var(--line);padding-top:12px}
+.files .row{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-bottom:6px}
+.files .yr{font-family:var(--mono);font-size:.85rem;width:3.4em;color:var(--muted)}
+.files a{font-family:var(--display);font-size:.88rem;text-decoration:none;border:1px solid var(--line);padding:3px 10px;background:var(--bg)}
+.files a:hover{border-color:var(--ink)}
+.files a.bar{color:var(--stamp)}
+footer{margin-top:48px;color:var(--muted);font-size:.88rem}
+@media (prefers-reduced-motion:no-preference){html{scroll-behavior:smooth}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">Clasa a XI-a · mate-info · sesiunea 2028</div>
+  <h1>Bacalaureat la mate-info: ce probe sunt și cum alegi materia</h1>
+  <p class="lede">Un ghid scurt pentru familie, cu structura fiecărei probe scrise și cu subiectele oficiale și baremele din 2024, 2025 și 2026 (sesiunea iunie–iulie), descărcate de pe subiecte.edu.ro.</p>
+
+  <div class="note">
+    <p><strong>Ce contează pentru noi:</strong> eleva intră în clasa a XII-a în 2027–2028 și dă bacalaureatul în vara lui 2028. Formatul descris aici e cel folosit în toți anii 2024–2026. Noul Bacalaureat (cel cu probe diferite) se aplică abia generației care termină liceul în 2030, deci nu o privește. Programa oficială pentru 2028 apare de obicei în toamna dinainte, pe subiecte.edu.ro.</p>
+  </div>
+
+  <h2>Ce probe dă la mate-info</h2>
+  <p>Probele scrise contează pentru medie. Fiecare durează 3 ore și se notează de la 1 la 10, cu 10 puncte din oficiu. Ca să promoveze, are nevoie de minimum 5 la fiecare probă scrisă și de media generală minimum 6.</p>
+  <div class="probe-map">
+    <div class="probe"><div class="code">E.a</div><strong>Limba și literatura română</strong><span>Obligatorie, varianta real-tehnic</span></div>
+    <div class="probe"><div class="code">E.c</div><strong>Matematică M_mate-info</strong><span>Obligatorie a profilului</span></div>
+    <div class="probe choice"><div class="code">E.d · la alegere</div><strong>Fizică, Chimie, Biologie sau Informatică</strong><span>Singura decizie de luat. Se alege la înscriere.</span></div>
+  </div>
+  <p style="margin-top:14px;color:var(--muted);font-size:.95rem">În afara acestor trei, mai sunt evaluările de competențe: comunicare orală în română (A), o limbă modernă (B) și competențe digitale (C). Ele primesc un calificativ sau un nivel și nu intră în medie.</p>
+
+  <h2>Comparație rapidă pentru proba la alegere (E.d)</h2>
+  <div class="tbl">
+    <table>
+      <thead><tr><th>Materie</th><th>Ce acoperă</th><th>Format</th><th>Legătura cu mate-info</th><th>Bun de știut</th></tr></thead>
+      <tbody>
+        <tr><td>Fizică</td><td>Alege 2 din 4 module: mecanică, termodinamică, curent continuu, optică</td><td>Per modul: 5 itemi grilă și 2 probleme</td><td>Mare: mult calcul, se sprijină pe matematică</td><td>Materia e împărțită pe module, deci învață doar jumătate din programă</td></tr>
+        <tr><td>Informatică</td><td>Algoritmi, C/C++ (sau Pascal), tablouri, șiruri, subprograme, recursivitate, grafuri, fișiere</td><td>Grilă, cod de completat, programe de scris</td><td>Maximă: e materia de profil, cu multe ore pe săptămână</td><td>La subiectul III se punctează și eficiența algoritmului</td></tr>
+        <tr><td>Chimie</td><td>Varianta anorganică sau varianta organică, la alegere</td><td>Grilă, adevărat/fals, probleme de calcul</td><td>Medie: calculul e simplu, dar e multă materie de memorat</td><td>La mate-info sunt de obicei mai puține ore de chimie, deci se pregătește mai mult singură</td></tr>
+        <tr><td>Biologie</td><td>Vegetală și animală (clasele IX–X) sau anatomie și genetică (clasele XI–XII)</td><td>Completări, grilă, adevărat/fals, probleme de genetică</td><td>Mică: aproape totul e teorie de memorat</td><td>Anatomia contează dacă vrea să dea la medicină</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <nav class="toc" aria-label="Materii">
+    <a href="#romana">Română</a><a href="#matematica">Matematică</a><a href="#fizica">Fizică</a><a href="#informatica">Informatică</a><a href="#chimie">Chimie</a><a href="#biologie">Biologie</a>
+  </nav>
+
+  <!-- ROMANA -->
+  <section class="fisa" id="romana">
+    <header><h3>Limba și literatura română</h3><span class="tag">E.a · obligatorie · real-tehnic</span></header>
+    <div class="body">
+      <div class="scale" aria-label="Punctaj: subiectul I 50, II 10, III 30, oficiu 10">
+        <div style="flex:50">I · 50p</div><div style="flex:10">II · 10p</div><div style="flex:30">III · 30p</div><div class="of" style="flex:10">oficiu 10</div>
+      </div>
+      <div class="cols">
+        <div><div class="lbl">Structura</div><ul>
+          <li><b>Subiectul I (50p).</b> Partea A: 5 cerințe pe un text la prima vedere (sensul unor cuvinte, idei din text), 30p. Partea B: un text argumentativ de minimum 150 de cuvinte, 20p.</li>
+          <li><b>Subiectul II (10p).</b> Un răspuns de minimum 50 de cuvinte despre un fragment literar, de exemplu perspectiva narativă sau rolul notațiilor autorului.</li>
+          <li><b>Subiectul III (30p).</b> Un eseu de minimum 400 de cuvinte despre o operă studiată (în 2026: o poezie de George Bacovia), pe trei repere date.</li>
+        </ul></div>
+        <div><div class="lbl">Ce înseamnă pentru ea</div><ul class="plus">
+          <li>Formatul e foarte previzibil, iar baremul punctează și redactarea: ortografie, punctuație, structura eseului.</li>
+          <li>Eseurile pe autorii din programă se pot pregăti din timp.</li>
+        </ul><ul class="minus" style="margin-top:6px">
+          <li>Trebuie respectate limitele de cuvinte. Dacă textul e prea scurt, se pierd punctele pentru redactare.</li>
+        </ul></div>
+      </div>
+      <div class="files" data-key="romana"></div>
+    </div>
+  </section>
+
+  <!-- MATEMATICA -->
+  <section class="fisa" id="matematica">
+    <header><h3>Matematică M_mate-info</h3><span class="tag">E.c · obligatorie</span></header>
+    <div class="body">
+      <div class="scale" aria-label="Punctaj: 30, 30, 30, oficiu 10">
+        <div style="flex:30">I · 30p</div><div style="flex:30">II · 30p</div><div style="flex:30">III · 30p</div><div class="of" style="flex:10">oficiu 10</div>
+      </div>
+      <div class="cols">
+        <div><div class="lbl">Structura</div><ul>
+          <li><b>Subiectul I (30p).</b> 6 exerciții scurte de câte 5p: numere complexe, funcții, ecuații, combinatorică, geometrie analitică, trigonometrie.</li>
+          <li><b>Subiectul II (30p).</b> 2 probleme de algebră cu punctele a, b, c: matrice, determinanți și sisteme; legi de compoziție sau polinoame.</li>
+          <li><b>Subiectul III (30p).</b> 2 probleme de analiză: derivate și studiul funcțiilor, apoi integrale.</li>
+        </ul></div>
+        <div><div class="lbl">Ce înseamnă pentru ea</div><ul class="plus">
+          <li>Subiectul I și punctele „a” se rezolvă cu exercițiu constant, deci nota de 7–8 e accesibilă.</li>
+          <li>Punctele „c” fac diferența pentru notele de 9 și 10.</li>
+        </ul><ul class="minus" style="margin-top:6px">
+          <li>Programa e cea mai lungă dintre toate probele: cuprinde materia claselor IX–XII.</li>
+        </ul></div>
+      </div>
+      <div class="files" data-key="matematica"></div>
+    </div>
+  </section>
+
+  <!-- FIZICA -->
+  <section class="fisa" id="fizica">
+    <header><h3>Fizică</h3><span class="tag">E.d · la alegere · teoretic-vocațional</span></header>
+    <div class="body">
+      <div class="scale" aria-label="Punctaj: modul 1 45, modul 2 45, oficiu 10">
+        <div style="flex:45">Modul ales 1 · 45p</div><div style="flex:45">Modul ales 2 · 45p</div><div class="of" style="flex:10">oficiu 10</div>
+      </div>
+      <div class="cols">
+        <div><div class="lbl">Structura</div><ul>
+          <li>Patru module: A. Mecanică, B. Termodinamică, C. Curent continuu, D. Optică. Candidatul rezolvă <b>doar două</b>. Dacă abordează mai mult de două, se iau în considerare doar primele două module abordate.</li>
+          <li>Fiecare modul are 45p: I. 5 itemi grilă (15p), II. o problemă (15p), III. o problemă (15p).</li>
+        </ul></div>
+        <div><div class="lbl">Ce înseamnă pentru ea</div><ul class="plus">
+          <li>Învață doar două capitole mari. Combinațiile preferate sunt mecanică cu electricitate și mecanică cu termodinamică.</li>
+          <li>Problemele seamănă mult de la un an la altul.</li>
+        </ul><ul class="minus" style="margin-top:6px">
+          <li>Are nevoie de înțelegere, nu doar de formule memorate. Erorile de calcul se depunctează.</li>
+        </ul></div>
+      </div>
+      <div class="files" data-key="fizica"></div>
+    </div>
+  </section>
+
+  <!-- INFORMATICA -->
+  <section class="fisa" id="informatica">
+    <header><h3>Informatică</h3><span class="tag">E.d · la alegere · specializarea mate-info</span></header>
+    <div class="body">
+      <div class="scale" aria-label="Punctaj: 20, 40, 30, oficiu 10">
+        <div style="flex:20">I · 20p</div><div style="flex:40">II · 40p</div><div style="flex:30">III · 30p</div><div class="of" style="flex:10">oficiu 10</div>
+      </div>
+      <div class="cols">
+        <div><div class="lbl">Structura</div><ul>
+          <li><b>Subiectul I (20p).</b> 5 itemi grilă de câte 4p: expresii, structuri de control, recursivitate, grafuri și arbori, backtracking.</li>
+          <li><b>Subiectul II (40p).</b> Un algoritm în pseudocod de urmărit și rescris, apoi secvențe de cod: structuri, șiruri de caractere, grafuri.</li>
+          <li><b>Subiectul III (30p).</b> Un subprogram, un program cu tablouri sau șiruri și o problemă cu date din fișier, unde se punctează și eficiența soluției.</li>
+          <li>Limbajul se alege: C/C++ sau Pascal. Baremul e comun.</li>
+        </ul></div>
+        <div><div class="lbl">Ce înseamnă pentru ea</div><ul class="plus">
+          <li>La mate-info e materia cu cele mai multe ore de școală, deci pregătirea se face în mare parte la clasă.</li>
+          <li>Logica seamănă cu cea de la matematică. Poate obține punctaj maxim dacă exersează constant.</li>
+        </ul><ul class="minus" style="margin-top:6px">
+          <li>Codul se scrie pe hârtie, fără compilator. Trebuie exersată scrierea de mână a programelor.</li>
+        </ul></div>
+      </div>
+      <div class="files" data-key="informatica"></div>
+    </div>
+  </section>
+
+  <!-- CHIMIE -->
+  <section class="fisa" id="chimie">
+    <header><h3>Chimie (anorganică sau organică)</h3><span class="tag">E.d · la alegere · două variante</span></header>
+    <div class="body">
+      <div class="scale" aria-label="Punctaj: 40, 25, 25, oficiu 10">
+        <div style="flex:40">I · 40p</div><div style="flex:25">II · 25p</div><div style="flex:25">III · 25p</div><div class="of" style="flex:10">oficiu 10</div>
+      </div>
+      <div class="cols">
+        <div><div class="lbl">Structura (la fel la ambele variante)</div><ul>
+          <li><b>Subiectul I (40p).</b> A: 10 itemi grilă (30p). B: 5 afirmații adevărat/fals (10p).</li>
+          <li><b>Subiectul II (25p)</b> și <b>Subiectul III (25p).</b> Cerințe structurate cu ecuații de reacție și calcule: randament, puritate, mase, volume.</li>
+          <li><b>Anorganică:</b> structura atomului, tabelul periodic, legături chimice, soluții, redox, termochimie, viteza de reacție, electroliză.</li>
+          <li><b>Organică:</b> hidrocarburi, alcooli, acizi, grăsimi, zaharide, proteine.</li>
+        </ul></div>
+        <div><div class="lbl">Ce înseamnă pentru ea</div><ul class="plus">
+          <li>Calculele sunt de nivel ușor pentru cineva de la mate-info.</li>
+          <li>Subiectele sunt foarte tipizate.</li>
+        </ul><ul class="minus" style="margin-top:6px">
+          <li>E multă materie de memorat (formule, reacții), iar la mate-info se fac puține ore de chimie.</li>
+          <li>Are sens mai ales dacă vrea la medicină, farmacie sau inginerie chimică.</li>
+        </ul></div>
+      </div>
+      <div class="files" data-key="chimie"></div>
+    </div>
+  </section>
+
+  <!-- BIOLOGIE -->
+  <section class="fisa" id="biologie">
+    <header><h3>Biologie (vegetală și animală sau anatomie)</h3><span class="tag">E.d · la alegere · două variante</span></header>
+    <div class="body">
+      <div class="scale" aria-label="Punctaj: 30, 30, 30, oficiu 10">
+        <div style="flex:30">I · 30p</div><div style="flex:30">II · 30p</div><div style="flex:30">III · 30p</div><div class="of" style="flex:10">oficiu 10</div>
+      </div>
+      <div class="cols">
+        <div><div class="lbl">Structura (la fel la ambele variante)</div><ul>
+          <li><b>Subiectul I (30p).</b> Completare de spații (4p), exemple cu caracteristici (6p), 5 itemi grilă (10p), adevărat/fals (10p).</li>
+          <li><b>Subiectul II (30p).</b> O problemă structurată (18p) și o problemă de genetică (12p).</li>
+          <li><b>Subiectul III (30p).</b> Două teme mai ample (14p și 16p).</li>
+          <li><b>Vegetală și animală:</b> materia claselor IX–X. <b>Anatomie, genetică, ecologie umană:</b> materia claselor XI–XII.</li>
+        </ul></div>
+        <div><div class="lbl">Ce înseamnă pentru ea</div><ul class="plus">
+          <li>Aproape nu are calcule, doar problemele de genetică.</li>
+          <li>Anatomia e aceeași materie ca la admiterea la medicină.</li>
+        </ul><ul class="minus" style="margin-top:6px">
+          <li>Se bazează aproape complet pe memorare, iar la mate-info biologia are puține ore.</li>
+        </ul></div>
+      </div>
+      <div class="files" data-key="biologie"></div>
+    </div>
+  </section>
+
+  <h2>Cum poate decide</h2>
+  <ul>
+    <li><b>Un test în condiții reale:</b> să rezolve în 3 ore subiectul din 2026 la cele 1–2 materii care o tentează, apoi să se corecteze singură cu baremul de mai sus. Rezultatul spune mai mult decât orice comparație.</li>
+    <li><b>Facultatea țintă:</b> la medicină sau farmacie, biologia sau chimia ajută și la admitere. La automatică, calculatoare sau informatică, informatica sau fizica se leagă direct de ce urmează.</li>
+    <li><b>Timpul disponibil în clasa a XII-a:</b> informatica și fizica se sprijină pe ce face deja la școală. Chimia și biologia cer de obicei pregătire în plus, în afara orelor.</li>
+  </ul>
+
+  <footer>
+    <p>Sursa subiectelor și a baremelor: Centrul Național de Politici și Evaluare în Educație, arhivele oficiale subiecte2024.edu.ro, subiecte2025.edu.ro și subiecte2026.edu.ro. Sunt incluse variantele în limba română, sesiunea iunie–iulie. Structura e descrisă după subiectele din 2026. Butoanele roșii deschid baremul. Documentele sunt publicate de Ministerul Educației și Cercetării; această pagină doar le adună pentru consultare.</p>
+  </footer>
+</div>
+
+<script>
+const ARH = {
+  romana:{2024:"http://subiecte2024.edu.ro/2024/bacalaureat/Subiecte_si_bareme/E_a_LLR_01-iulie-2024.zip",2025:"http://subiecte2025.edu.ro/2025/bacalaureat/Subiecte_si_bareme/E_a_2025_ses_iunie.zip",2026:"http://subiecte2026.edu.ro/2026/bacalaureat/Subiecte_si_bareme/Ea_2026_ses_iunie.zip"},
+  matematica:{2024:"http://subiecte2024.edu.ro/2024/bacalaureat/Subiecte_si_bareme/E_c_Matematica_Istorie_02-iulie-2024.zip",2025:"http://subiecte2025.edu.ro/2025/bacalaureat/Subiecte_si_bareme/E_c_2025_ses_iunie.zip",2026:"http://subiecte2026.edu.ro/2026/bacalaureat/Subiecte_si_bareme/Ec_2026_ses_iunie-iulie_01072026.zip"},
+  ed:{2024:"http://subiecte2024.edu.ro/2024/bacalaureat/Subiecte_si_bareme/E_d_04_iulie_2024.zip",2025:"http://subiecte2025.edu.ro/2025/bacalaureat/Subiecte_si_bareme/E_d_2025_ses_iunie.zip",2026:"http://subiecte2026.edu.ro/2026/bacalaureat/Subiecte_si_bareme/Ed_2026_ses_iunie-iulie.zip"}
+};
+const F = {
+  romana: [["01_Limba_romana", {2024:["E_a_romana_real_tehn_2024_var_02.pdf","E_a_romana_real_tehn_2024_bar_02.pdf"],2025:["E_a_romana_real_tehn_2025_var_07.pdf","E_a_romana_real_tehn_2025_bar_07.pdf"],2026:["E_a_romana_real_tehn_2026_var_06.pdf","E_a_romana_real_tehn_2026_bar_06.pdf"]}]],
+  matematica: [["02_Matematica_mate-info", {2024:["E_c_matematica_M_mate-info_2024_var_10_LRO.pdf","E_c_matematica_M_mate-info_2024_bar_10_LRO.pdf"],2025:["E_c_matematica_M_mate-info_2025_var_01_LRO.pdf","E_c_matematica_M_mate-info_2025_bar_01_LRO.pdf"],2026:["E_c_matematica_M_mate-info_2026_var_03_LRO.pdf","E_c_matematica_M_mate-info_2026_bar_03_LRO.pdf"]}]],
+  fizica: [["03_Fizica", {2024:["E_d_fizica_teoretic_vocational_2024_var_03_LRO.pdf","E_d_fizica_teoretic_vocational_2024_bar_03_LRO.pdf"],2025:["E_d_fizica_teoretic_vocational_2025_var_01_LRO.pdf","E_d_fizica_teoretic_vocational_2025_bar_01_LRO.pdf"],2026:["E_d_fizica_teoretic_vocational_2026_var_03_LRO.pdf","E_d_fizica_teoretic_vocational_2026_bar_03_LRO.pdf"]}]],
+  informatica: [["04_Informatica_mate-info", {2024:["E_d_Informatica_2024_sp_MI_C_var_03_LRO.pdf","E_d_Informatica_2024_sp_MI_bar_03_LRO.pdf","E_d_Informatica_2024_sp_MI_Pascal_var_03_LRO.pdf"],2025:["E_d_Informatica_2025_sp_MI_C_var_01_LRO.pdf","E_d_informatica_2025_sp_MI_bar_01_LRO.pdf","E_d_Informatica_2025_sp_MI_Pascal_var_01_LRO.pdf"],2026:["E_d_Informatica_2026_sp_MI_C_var_03_LRO.pdf","E_d_Informatica_2026_sp_MI_bar_03_LRO.pdf","E_d_Informatica_2026_sp_MI_Pascal_var_03_LRO.pdf"]}]],
+  chimie: [["05_Chimie_anorganica", {2024:["E_d_chimie_anorganica_2024_var_03_LRO.pdf","E_d_chimie_anorganica_2024_bar_03_LRO.pdf"],2025:["E_d_chimie_anorganica_2025_var_01_LRO.pdf","E_d_chimie_anorganica_2025_bar_01_LRO.pdf"],2026:["E_d_chimie_anorganica_2026_var_03_LRO.pdf","E_d_chimie_anorganica_2026_bar_03_LRO.pdf"]}, "Anorganică"],
+           ["06_Chimie_organica", {2024:["E_d_chimie_organica_2024_var_03_LRO.pdf","E_d_chimie_organica_2024_bar_03_LRO.pdf"],2025:["E_d_chimie_organica_2025_var_01_LRO.pdf","E_d_chimie_organica_2025_bar_01_LRO.pdf"],2026:["E_d_chimie_organica_2026_var_03_LRO.pdf","E_d_chimie_organica_2026_bar_03_LRO.pdf"]}, "Organică"]],
+  biologie: [["07_Biologie_vegetala_animala", {2024:["E_d_bio_veg_anim_2024_var_03_LRO.pdf","E_d_bio_veg_anim_2024_bar_03_LRO.pdf"],2025:["E_d_bio_veg_anim_2025_var_01_LRO.pdf","E_d_bio_veg_anim_2025_bar_01_LRO.pdf"],2026:["E_d_bio_veg_anim_2026_var_03_LRO.pdf","E_d_bio_veg_anim_2026_bar_03_LRO.pdf"]}, "Vegetală și animală"],
+           ["08_Anatomie_fiziologie_genetica", {2024:["E_d_anat_fiz_gen_ec_um_2024_var_03_LRO.pdf","E_d_anat_fiz_gen_ec_um_2024_bar_03_LRO.pdf"],2025:["E_d_anat_fiz_gen_ec_um_2025_var_01_LRO.pdf","E_d_anat_fiz_gen_ec_um_2025_bar_01_LRO.pdf"],2026:["E_d_anat_fiz_gen_ec_um_2026_var_03_LRO.pdf","E_d_anat_fiz_gen_ec_um_2026_bar_03_LRO.pdf"]}, "Anatomie și genetică"]]
+};
+function label(f){ if(/_bar_/.test(f)) return ["Barem","bar"]; if(/Pascal/.test(f)) return ["Subiect Pascal",""]; if(/_C_var/.test(f)) return ["Subiect C/C++",""]; return ["Subiect",""]; }
+document.querySelectorAll('.files').forEach(box=>{
+  const groups = F[box.dataset.key]; let html = '<div class="lbl">Subiecte și bareme oficiale</div>';
+  groups.forEach(([dir, years, name])=>{
+    if(name) html += `<div class="lbl" style="text-transform:none;letter-spacing:0;margin-top:8px">${name}</div>`;
+    Object.keys(years).forEach(y=>{
+      const key = ARH[box.dataset.key] ? box.dataset.key : 'ed';
+      html += `<div class="row"><span class="yr">${y}</span>` + years[y].map(f=>{const [t,c]=label(f); return `<a class="${c}" href="${f}" target="_blank" rel="noopener" data-x="pdf/${dir}/${f}" data-title="${(name||box.closest('.fisa').querySelector('h3').textContent)} · ${y} · ${t}" data-orig="${ARH[key][y]}">${t}</a>`}).join('') + `</div>`;
+    });
+  });
+  box.innerHTML = html;
+});
+
+</script>
+
+</body>
+</html>
